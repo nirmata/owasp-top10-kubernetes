@@ -1,0 +1,45 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  annotations:
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/warn: baseline
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/description: Host namespaces (Process ID namespace, Inter-Process Communication namespace, and network namespace) allow access to shared information and can be used to elevate privileges. Pods should not be allowed access to host namespaces. This policy ensures fields which make use of these host namespaces are unset or set to false.
+    policies.kyverno.io/minversion: 1.15.0
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/title: Disallow Host Namespaces
+  name: disallow-host-namespaces
+spec:
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ""
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  validationActions:
+  - Deny
+  validations:
+  - expression: "!variables.hostNetwork"
+    messageExpression: "'Pod ' + object.metadata.name + ' is denied: hostNetwork=true is not allowed. Host network namespace sharing provides access to the host network stack and can be used to elevate privileges.'"
+  - expression: "!variables.hostPID"
+    messageExpression: "'Pod ' + object.metadata.name + ' is denied: hostPID=true is not allowed. Host PID namespace sharing provides access to host processes and can be used to elevate privileges.'"
+  - expression: "!variables.hostIPC"
+    messageExpression: "'Pod ' + object.metadata.name + ' is denied: hostIPC=true is not allowed. Host IPC namespace sharing provides access to host inter-process communication and can be used to elevate privileges.'"
+  variables:
+  - expression: "object.spec.?hostNetwork.orValue(false)"
+    name: hostNetwork
+  - expression: "object.spec.?hostPID.orValue(false)"
+    name: hostPID
+  - expression: "object.spec.?hostIPC.orValue(false)"
+    name: hostIPC

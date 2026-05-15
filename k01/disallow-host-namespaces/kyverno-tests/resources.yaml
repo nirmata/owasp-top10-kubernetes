@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: compliant-pod
+  namespace: default
+spec:
+  containers:
+  - image: nginx:1.21
+    name: nginx
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: compliant-pod-explicit-false
+  namespace: default
+spec:
+  containers:
+  - image: busybox:1.35
+    name: app
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: host-network-pod
+  namespace: default
+spec:
+  containers:
+  - image: alpine:3.18
+    name: network-app
+  hostNetwork: true
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: host-pid-pod
+  namespace: default
+spec:
+  containers:
+  - image: ubuntu:22.04
+    name: pid-app
+  hostPID: true
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: host-ipc-pod
+  namespace: default
+spec:
+  containers:
+  - image: debian:bullseye
+    name: ipc-app
+  hostIPC: true
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: all-host-namespaces-pod
+  namespace: default
+spec:
+  containers:
+  - image: redis:7
+    name: privileged-app
+  hostIPC: true
+  hostNetwork: true
+  hostPID: true
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mixed-host-settings-pod
+  namespace: default
+spec:
+  containers:
+  - image: postgres:15
+    name: mixed-app
+  hostIPC: false
+  hostNetwork: false
+  hostPID: true
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-container-compliant
+  namespace: production
+spec:
+  containers:
+  - image: nginx:1.21
+    name: web
+  - image: fluent/fluent-bit:2.1
+    name: sidecar
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-container-host-network
+  namespace: production
+spec:
+  containers:
+  - image: httpd:2.4
+    name: web
+  - image: prom/node-exporter:v1.6.0
+    name: monitoring
+  hostNetwork: true

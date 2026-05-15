@@ -1,0 +1,183 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-no-security-context
+  namespace: default
+spec:
+  containers:
+  - image: nginx:latest
+    name: nginx
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-privilege-escalation-false
+  namespace: default
+spec:
+  containers:
+  - image: nginx:latest
+    name: nginx
+    securityContext:
+      allowPrivilegeEscalation: false
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-privilege-escalation-true
+  namespace: default
+spec:
+  containers:
+  - image: nginx:latest
+    name: nginx
+    securityContext:
+      allowPrivilegeEscalation: true
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-multiple-containers-compliant
+  namespace: default
+spec:
+  containers:
+  - image: nginx:latest
+    name: nginx
+    securityContext:
+      allowPrivilegeEscalation: false
+  - image: busybox:latest
+    name: sidecar
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-multiple-containers-violation
+  namespace: default
+spec:
+  containers:
+  - image: nginx:latest
+    name: nginx
+    securityContext:
+      allowPrivilegeEscalation: false
+  - image: busybox:latest
+    name: sidecar
+    securityContext:
+      allowPrivilegeEscalation: true
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-init-containers-compliant
+  namespace: default
+spec:
+  containers:
+  - image: nginx:latest
+    name: nginx
+    securityContext:
+      allowPrivilegeEscalation: false
+  initContainers:
+  - image: busybox:latest
+    name: init-setup
+    securityContext:
+      allowPrivilegeEscalation: false
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-init-containers-violation
+  namespace: default
+spec:
+  containers:
+  - image: nginx:latest
+    name: nginx
+    securityContext:
+      allowPrivilegeEscalation: false
+  initContainers:
+  - image: busybox:latest
+    name: init-setup
+    securityContext:
+      allowPrivilegeEscalation: true
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-ephemeral-containers-compliant
+  namespace: default
+spec:
+  containers:
+  - image: nginx:latest
+    name: nginx
+    securityContext:
+      allowPrivilegeEscalation: false
+  ephemeralContainers:
+  - image: busybox:latest
+    name: debug
+    securityContext:
+      allowPrivilegeEscalation: false
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-ephemeral-containers-violation
+  namespace: default
+spec:
+  containers:
+  - image: nginx:latest
+    name: nginx
+    securityContext:
+      allowPrivilegeEscalation: false
+  ephemeralContainers:
+  - image: busybox:latest
+    name: debug
+    securityContext:
+      allowPrivilegeEscalation: true
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-mixed-security-contexts
+  namespace: default
+spec:
+  containers:
+  - image: nginx:latest
+    name: nginx
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+  - image: busybox:latest
+    name: sidecar
+    securityContext:
+      readOnlyRootFilesystem: true
+  initContainers:
+  - image: busybox:latest
+    name: init-setup
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-all-container-types-violation
+  namespace: default
+spec:
+  containers:
+  - image: nginx:latest
+    name: nginx
+    securityContext:
+      allowPrivilegeEscalation: true
+  ephemeralContainers:
+  - image: busybox:latest
+    name: debug
+    securityContext:
+      allowPrivilegeEscalation: true
+  initContainers:
+  - image: busybox:latest
+    name: init-setup
+    securityContext:
+      allowPrivilegeEscalation: true

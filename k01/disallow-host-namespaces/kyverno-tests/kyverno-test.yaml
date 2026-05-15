@@ -1,0 +1,63 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: disallow-host-namespaces-test
+policies:
+- ../disallow-host-namespaces.yaml
+resources:
+- resources.yaml
+results:
+- kind: Pod
+  policy: disallow-host-namespaces
+  resources:
+  - default/compliant-pod
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: disallow-host-namespaces
+  resources:
+  - default/compliant-pod-explicit-false
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: disallow-host-namespaces
+  resources:
+  - default/host-network-pod
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: disallow-host-namespaces
+  resources:
+  - default/host-pid-pod
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: disallow-host-namespaces
+  resources:
+  - default/host-ipc-pod
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: disallow-host-namespaces
+  resources:
+  - default/all-host-namespaces-pod
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: disallow-host-namespaces
+  resources:
+  - default/mixed-host-settings-pod
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: disallow-host-namespaces
+  resources:
+  - production/multi-container-compliant
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: disallow-host-namespaces
+  resources:
+  - production/multi-container-host-network
+  result: fail
+  rule: ""

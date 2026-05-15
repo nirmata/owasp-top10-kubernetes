@@ -1,0 +1,81 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: require-resource-limits-test
+policies:
+- ../require-resource-limits.yaml
+resources:
+- resources.yaml
+results:
+- kind: Pod
+  policy: require-pod-resource-limits
+  resources:
+  - compliant-pod-with-all-limits
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: require-pod-resource-limits
+  resources:
+  - compliant-pod-multiple-containers
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: require-pod-resource-limits
+  resources:
+  - compliant-pod-with-init-containers
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: require-pod-resource-limits
+  resources:
+  - compliant-pod-with-ephemeral-containers
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: require-pod-resource-limits
+  resources:
+  - non-compliant-no-limits
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: require-pod-resource-limits
+  resources:
+  - non-compliant-missing-cpu-limit
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: require-pod-resource-limits
+  resources:
+  - non-compliant-missing-memory-limit
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: require-pod-resource-limits
+  resources:
+  - non-compliant-empty-limits
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: require-pod-resource-limits
+  resources:
+  - non-compliant-mixed-compliance
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: require-pod-resource-limits
+  resources:
+  - non-compliant-init-container-missing-limits
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: require-pod-resource-limits
+  resources:
+  - non-compliant-requests-only
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: require-pod-resource-limits
+  resources:
+  - edge-case-zero-limits
+  result: pass
+  rule: ""

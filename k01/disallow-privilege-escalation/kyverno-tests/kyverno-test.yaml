@@ -1,0 +1,75 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: disallow-privilege-escalation-test
+policies:
+- ../disallow-privilege-escalation.yaml
+resources:
+- resources.yaml
+results:
+- kind: Pod
+  policy: disallow-privilege-escalation
+  resources:
+  - pod-no-security-context
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: disallow-privilege-escalation
+  resources:
+  - pod-privilege-escalation-false
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: disallow-privilege-escalation
+  resources:
+  - pod-privilege-escalation-true
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: disallow-privilege-escalation
+  resources:
+  - pod-multiple-containers-compliant
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: disallow-privilege-escalation
+  resources:
+  - pod-multiple-containers-violation
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: disallow-privilege-escalation
+  resources:
+  - pod-with-init-containers-compliant
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: disallow-privilege-escalation
+  resources:
+  - pod-with-init-containers-violation
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: disallow-privilege-escalation
+  resources:
+  - pod-with-ephemeral-containers-compliant
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: disallow-privilege-escalation
+  resources:
+  - pod-with-ephemeral-containers-violation
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: disallow-privilege-escalation
+  resources:
+  - pod-mixed-security-contexts
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: disallow-privilege-escalation
+  resources:
+  - pod-all-container-types-violation
+  result: fail
+  rule: ""

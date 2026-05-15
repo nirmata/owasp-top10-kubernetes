@@ -1,0 +1,105 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: k01-require-non-root-containers
+policies:
+- ../require-non-root-containers.yaml
+resources:
+- resources.yaml
+results:
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - compliant-pod-runasnonroot
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - compliant-pod-runasuser-1000
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - compliant-container-runasnonroot
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - compliant-container-runasuser-1001
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - compliant-mixed-containers
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - compliant-ephemeral-containers
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - violation-pod-runasuser-root
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - violation-container-runasuser-root
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - violation-no-security-context
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - violation-pod-runasnonroot-false
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - violation-container-runasnonroot-false
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - violation-mixed-root-containers
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - violation-init-container-root
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - violation-ephemeral-container-root
+  result: fail
+  rule: ""
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - edge-case-pod-runasuser-negative
+  result: pass
+  rule: ""
+- kind: Pod
+  policy: k01-enforce-non-root-containers
+  resources:
+  - edge-case-large-userid
+  result: pass
+  rule: ""

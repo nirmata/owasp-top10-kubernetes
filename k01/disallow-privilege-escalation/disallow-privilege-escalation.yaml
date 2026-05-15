@@ -1,0 +1,32 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  annotations:
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/description: Prevents privilege escalation in containers by ensuring allowPrivilegeEscalation is set to false in all container security contexts. This policy helps prevent K01 control violations for privilege escalation attacks.
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/title: Disallow Privilege Escalation
+  name: disallow-privilege-escalation
+spec:
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ""
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  validationActions:
+  - Audit
+  validations:
+  - expression: variables.allContainers.all(container, !has(container.securityContext) || !has(container.securityContext.allowPrivilegeEscalation) || container.securityContext.allowPrivilegeEscalation == false)
+    messageExpression: '''Privilege escalation is not allowed. Container '' + variables.allContainers.filter(c, has(c.securityContext) && has(c.securityContext.allowPrivilegeEscalation) && c.securityContext.allowPrivilegeEscalation == true).map(c, c.name).join('', '') + '' must set allowPrivilegeEscalation to false'''
+  variables:
+  - expression: object.spec.containers + object.spec.?initContainers.orValue([]) + object.spec.?ephemeralContainers.orValue([])
+    name: allContainers
